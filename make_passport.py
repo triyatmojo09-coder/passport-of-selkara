@@ -105,14 +105,14 @@ def main():
         for x in range(520, 1017):
             y = y0 + 7 * math.sin((x - 520) / 46.0 + k * 0.9)
             pts.append((x, y))
-        d.line(pts, fill=(168, 205, 198, 110), width=1)
+        d.line(pts, fill=(168, 205, 198, 64), width=1)
     for k in range(10):
         x0 = 540 + k * 50
         pts = []
         for y in range(24, 660):
             x = x0 + 6 * math.sin(y / 52.0 + k * 1.1)
             pts.append((x, y))
-        d.line(pts, fill=(180, 200, 215, 42), width=1)
+        d.line(pts, fill=(180, 200, 215, 26), width=1)
 
     # centre fold
     for i in range(18):
@@ -157,36 +157,73 @@ def main():
     pw, phh = px1 - px0, py1 - py0
     cx = pw // 2
     blue = (25, 45, 95, 255)
-    # shoulders / collar
-    pd.arc([cx - 52, 118, cx + 52, 196], start=180, end=360, fill=blue, width=3)
-    pd.line([(cx - 52, 157), (cx - 20, 128)], fill=blue, width=3)
-    pd.line([(cx + 52, 157), (cx + 20, 128)], fill=blue, width=3)
-    pd.line([(cx - 20, 128), (cx, 148), (cx + 20, 128)], fill=blue, width=2)  # collar V
-    pd.line([(cx - 34, 150), (cx - 34, 174)], fill=blue, width=2)
-    pd.line([(cx + 34, 150), (cx + 34, 174)], fill=blue, width=2)
-    # neck
-    pd.line([(cx - 10, 108), (cx - 10, 130)], fill=blue, width=3)
-    pd.line([(cx + 10, 108), (cx + 10, 130)], fill=blue, width=3)
-    # face oval
-    pd.ellipse([cx - 30, 34, cx + 30, 112], outline=blue, width=3)
-    # hair + bun
-    pd.arc([cx - 31, 26, cx + 31, 78], start=180, end=360, fill=blue, width=4)
-    pd.ellipse([cx - 11, 8, cx + 11, 30], outline=blue, width=3)
-    pd.arc([cx - 11, 8, cx + 11, 30], start=20, end=160, fill=blue, width=1)
-    # hair parting line (engraving detail)
-    pd.line([(cx, 30), (cx, 42)], fill=blue, width=1)
-    pd.arc([cx - 28, 32, cx, 52], start=200, end=330, fill=blue, width=1)
-    pd.arc([cx, 32, cx + 28, 52], start=210, end=340, fill=blue, width=1)
-    # eyes / brows / nose / mouth (symmetric, minimal)
-    pd.line([(cx - 19, 66), (cx - 7, 66)], fill=blue, width=2)
-    pd.line([(cx + 7, 66), (cx + 19, 66)], fill=blue, width=2)
-    pd.ellipse([cx - 15, 72, cx - 11, 78], fill=blue)
-    pd.ellipse([cx + 11, 72, cx + 15, 78], fill=blue)
-    pd.line([(cx, 78), (cx - 2, 90), (cx + 2, 90)], fill=blue, width=2)
-    pd.arc([cx - 9, 92, cx + 9, 104], start=15, end=165, fill=blue, width=2)
-    # fine horizontal engraving lines at photo bottom
-    for yy in range(158, 172, 4):
-        pd.line([(6, yy), (pw - 6, yy)], fill=(25, 45, 95, 90), width=1)
+    # engraved backdrop: fine horizontal rules across the whole photo,
+    # denser toward the edges, as on a banknote portrait
+    for yy in range(4, phh - 2, 3):
+        edge = min(yy, phh - yy)
+        a = 26 if edge > 26 else 44
+        pd.line([(3, yy), (pw - 3, yy)], fill=(25, 45, 95, a), width=1)
+    # shoulders / jacket with lapels and hatch shading
+    pd.arc([cx - 54, 116, cx + 54, 198], start=180, end=360, fill=blue, width=3)
+    pd.line([(cx - 54, 156), (cx - 21, 126)], fill=blue, width=3)
+    pd.line([(cx + 54, 156), (cx + 21, 126)], fill=blue, width=3)
+    pd.line([(cx - 21, 126), (cx, 150), (cx + 21, 126)], fill=blue, width=2)  # collar V
+    pd.line([(cx - 21, 126), (cx - 8, 142)], fill=blue, width=1)  # lapel fold
+    pd.line([(cx + 21, 126), (cx + 8, 142)], fill=blue, width=1)
+    for t in range(5):  # hatch on the jacket's left shoulder
+        pd.line([(cx - 50 + t * 3, 148 + t * 2), (cx - 38 + t * 3, 162 + t * 2)],
+                fill=(25, 45, 95, 130), width=1)
+    for t in range(5):  # hatch on the jacket's right shoulder
+        pd.line([(cx + 50 - t * 3, 148 + t * 2), (cx + 38 - t * 3, 162 + t * 2)],
+                fill=(25, 45, 95, 130), width=1)
+    # neck with a shaded side
+    pd.line([(cx - 10, 106), (cx - 10, 130)], fill=blue, width=3)
+    pd.line([(cx + 10, 106), (cx + 10, 130)], fill=blue, width=3)
+    for t in range(3):
+        pd.line([(cx + 4 + t * 2, 110 + t * 2), (cx + 4 + t * 2, 124 + t * 2)],
+                fill=(25, 45, 95, 120), width=1)
+    # face oval with a gentle jaw taper
+    pd.ellipse([cx - 30, 32, cx + 30, 110], outline=blue, width=3)
+    pd.line([(cx - 27, 92), (cx - 14, 108)], fill=blue, width=2)
+    pd.line([(cx + 27, 92), (cx + 14, 108)], fill=blue, width=2)
+    # hair: bun + swept-back mass drawn as curved engraving strokes
+    pd.ellipse([cx - 11, 6, cx + 11, 28], outline=blue, width=3)
+    for t in range(4):
+        pd.arc([cx - 11 + t * 2, 8 + t * 2, cx + 11 - t * 2, 28 - t * 2],
+               start=200, end=340, fill=(25, 45, 95, 170), width=1)
+    for r in (29, 24, 19):  # a few soft hair strokes over the crown
+        pd.arc([cx - r, 34 - int(r * 0.35), cx + r, 34 + int(r * 1.05)],
+               start=185, end=355, fill=(25, 45, 95, 165), width=1)
+    pd.line([(cx, 26), (cx, 38)], fill=blue, width=1)  # centre parting
+    pd.arc([cx - 29, 44, cx - 6, 66], start=250, end=330, fill=blue, width=1)
+    pd.arc([cx + 6, 44, cx + 29, 66], start=210, end=290, fill=blue, width=1)
+    # ears
+    pd.arc([cx - 35, 66, cx - 27, 84], start=270, end=90, fill=blue, width=2)
+    pd.arc([cx + 27, 66, cx + 35, 84], start=90, end=270, fill=blue, width=2)
+    # brows: calm, level arcs
+    pd.arc([cx - 21, 56, cx - 5, 68], start=190, end=345, fill=blue, width=2)
+    pd.arc([cx + 5, 56, cx + 21, 68], start=195, end=350, fill=blue, width=2)
+    # eyes: small, level — upper lid line, faint lower lid, iris half-lidded
+    for sgn in (-1, 1):
+        exx = cx + sgn * 13
+        pd.ellipse([exx - 2, 70, exx + 2, 75], fill=blue)  # iris
+        pd.line([(exx - 6, 69), (exx + 6, 69)], fill=blue, width=2)  # upper lid
+        pd.arc([exx - 6, 68, exx + 6, 78], start=35, end=145,
+               fill=(25, 45, 95, 140), width=1)  # lower lid, faint
+        pd.arc([exx - 6, 62, exx + 6, 72], start=200, end=340,
+               fill=(25, 45, 95, 130), width=1)  # lid crease
+    # nose: bridge line and base
+    pd.line([(cx, 74), (cx - 1, 88)], fill=blue, width=2)
+    pd.arc([cx - 5, 84, cx + 5, 93], start=20, end=160, fill=blue, width=2)
+    # mouth: closed, neutral — one firm line, a shorter shadow beneath
+    pd.line([(cx - 9, 99), (cx + 9, 99)], fill=blue, width=2)
+    pd.line([(cx - 5, 103), (cx + 5, 103)], fill=(25, 45, 95, 150), width=1)
+    # cheek shading: two short hatch groups
+    for t in range(3):
+        pd.line([(cx - 24 + t * 2, 84 + t * 3), (cx - 19 + t * 2, 88 + t * 3)],
+                fill=(25, 45, 95, 110), width=1)
+        pd.line([(cx + 24 - t * 2, 84 + t * 3), (cx + 19 - t * 2, 88 + t * 3)],
+                fill=(25, 45, 95, 110), width=1)
     img.alpha_composite(ph, (px0, py0))
     d = ImageDraw.Draw(img, "RGBA")
     centered(d, (px0 + px1) // 2, py1 + 4, "MAREN I. T.", F(SANS, 8), LABEL)
